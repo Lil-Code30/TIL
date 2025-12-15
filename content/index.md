@@ -1,6 +1,7 @@
 ---
-title: Welcome to Quartz
+title: Today I Learned
 ---
 
-This is a blank Quartz installation.
-See the [documentation](https://quartz.jzhao.xyz) for how to get started.
+What I am currently learning and exploring.
+
+- Python programming
