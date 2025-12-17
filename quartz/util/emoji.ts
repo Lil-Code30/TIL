@@ -1,7 +1,12 @@
 const U200D = String.fromCharCode(8205)
 const UFE0Fg = /\uFE0F/g
+const U20E3 = String.fromCharCode(8419) // Combining Enclosing Keycap
 
 export function getIconCode(char: string) {
+  // For keycap emojis (containing U+20E3), preserve the FE0F variant selector
+  if (char.indexOf(U20E3) >= 0) {
+    return toCodePoint(char)
+  }
   return toCodePoint(char.indexOf(U200D) < 0 ? char.replace(UFE0Fg, "") : char)
 }
 
@@ -14,12 +19,14 @@ function toCodePoint(unicodeSurrogates: string) {
   while (i < unicodeSurrogates.length) {
     c = unicodeSurrogates.charCodeAt(i++)
     if (p) {
-      r.push((65536 + ((p - 55296) << 10) + (c - 56320)).toString(16))
+      r.push(
+        (65536 + ((p - 55296) << 10) + (c - 56320)).toString(16).toUpperCase().padStart(4, "0"),
+      )
       p = 0
     } else if (55296 <= c && c <= 56319) {
       p = c
     } else {
-      r.push(c.toString(16))
+      r.push(c.toString(16).toUpperCase().padStart(4, "0"))
     }
   }
   return r.join("-")
@@ -37,7 +44,7 @@ export async function loadEmoji(code: string) {
     emojimap = data
   }
 
-  const name = emojimap.codePointToName[`${code.toUpperCase()}`]
+  const name = emojimap.codePointToName[code]
   if (!name) throw new Error(`codepoint ${code} not found in map`)
 
   const b64 = emojimap.nameToBase64[name]
