@@ -1,7 +1,8 @@
 ---
-title: Strings in Python
+title: 02 Strings in Python
 comments:
 ---
+
 ## 1️⃣ Concatenation
 
 Joining strings together using `+`.

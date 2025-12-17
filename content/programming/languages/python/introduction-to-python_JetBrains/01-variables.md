@@ -1,7 +1,8 @@
 ---
-title: Variables in Python
+title: 01 Variables in Python
 comments:
 ---
+
 ## 1️⃣ Variable Definition
 
 A **variable** is a name that refers to a value stored in memory.
