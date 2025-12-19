@@ -213,7 +213,7 @@ for n in range(5):
 
 Output:
 
-```
+```cmd
 0
 1
 3
