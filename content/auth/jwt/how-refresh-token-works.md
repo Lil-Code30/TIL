@@ -2,6 +2,8 @@
 title: How Refresh Token Works
 ---
 
+![fresh token flow](../images/refresh-token-flow.png)
+
 ## 1. User action triggers the refresh
 
 The user clicks a link or performs an action that requires authentication (for example: opening a protected page).
