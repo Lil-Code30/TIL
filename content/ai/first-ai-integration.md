@@ -23,31 +23,30 @@ I did all the process live on my [Youtube channel](https://www.youtube.com/@lico
 
 ## This are some sample code
 
-```Typescript
-import { Mistral } from "@mistralai/mistralai";
-import { aiBluePrintSchema } from "../validation/course-blue-print.schema";
-import dotenv from "dotenv";
+```typescript
+import { Mistral } from "@mistralai/mistralai"
+import { aiBluePrintSchema } from "../validation/course-blue-print.schema"
+import dotenv from "dotenv"
 
-dotenv.config();
+dotenv.config()
 
-const apiKey = process.env.MISTRAL_AI_STUDIO_API_KEY;
+const apiKey = process.env.MISTRAL_AI_STUDIO_API_KEY
 
-const client = new Mistral({ apiKey: apiKey });
+const client = new Mistral({ apiKey: apiKey })
 
 // System prompt to guide the AI's response
-const systemPrompt = `You are AcadXP AI, an academic game designer\n Your role is to transform any academic course into a structured, gamified experience.\n You must generate skills, challenges, and badges that are:\n academically meaningful\n discipline-agnostic\nachievable by a real student\nbalanced in difficulty and XP rewards\n You must ALWAYS respond with VALID JSON.\nDo not include explanations, markdown, or extra text.`;
+const systemPrompt = `You are AcadXP AI, an academic game designer\n Your role is to transform any academic course into a structured, gamified experience.\n You must generate skills, challenges, and badges that are:\n academically meaningful\n discipline-agnostic\nachievable by a real student\nbalanced in difficulty and XP rewards\n You must ALWAYS respond with VALID JSON.\nDo not include explanations, markdown, or extra text.`
 
 type CourseInfo = {
-  courseId: string;
-  courseTitle: string;
-  courseDescription: string;
-  academicLevel: string;
-};
+  courseId: string
+  courseTitle: string
+  courseDescription: string
+  academicLevel: string
+}
 
 // Build the user prompt based on the course information
 const buildCoursePrompt = (courseInfo: CourseInfo) => {
-  const { courseId, courseTitle, courseDescription, academicLevel } =
-    courseInfo;
+  const { courseId, courseTitle, courseDescription, academicLevel } = courseInfo
   return `
    Generate a gamified blueprint for the following academic course.
 
@@ -64,8 +63,8 @@ Rules:
 - Challenges must reference real academic activities
 - Avoid vague or generic content
 - Ensure a mix of easy, medium, and hard challenges
-- Use the provided course information to create relevant and engaging content`;
-};
+- Use the provided course information to create relevant and engaging content`
+}
 
 // CourseAgent Creator
 
@@ -78,7 +77,7 @@ Rules:
 // });
 
 export const aiGeneratedBluePrint = async (courseInfo: CourseInfo) => {
-  const userPrompt = buildCoursePrompt(courseInfo);
+  const userPrompt = buildCoursePrompt(courseInfo)
 
   const chatResponse = await client.chat.parse({
     model: "mistral-large-latest",
@@ -89,17 +88,16 @@ export const aiGeneratedBluePrint = async (courseInfo: CourseInfo) => {
     responseFormat: aiBluePrintSchema,
     maxTokens: 4000,
     temperature: 0.3,
-  });
+  })
 
-  return chatResponse;
-};
-
+  return chatResponse
+}
 ```
 
 ### AI BluePrint Schema
 
-```Typescript
-import * as z from "zod";
+```typescript
+import * as z from "zod"
 
 // Individual rule schema
 export const RuleSchema = z.object({
@@ -112,13 +110,13 @@ export const RuleSchema = z.object({
       courseId: z.string(),
     })
     .optional(),
-});
+})
 
 // Criteria schema with multiple rules and logic
 export const CriteriaSchema = z.object({
   logic: z.enum(["AND", "OR"]).default("AND"),
   rules: z.array(RuleSchema).min(1, "At least one rule is required"),
-});
+})
 
 export const aiChallengeBluePrintSchema = z.object({
   title: z.string().min(10, "Title is required"),
@@ -128,7 +126,7 @@ export const aiChallengeBluePrintSchema = z.object({
   }),
   xpReward: z.number().int().positive("XP reward must be a positive integer"),
   criteria: CriteriaSchema,
-});
+})
 
 export const aiSkillBluePrintSchema = z.object({
   title: z.string().min(3, "Title is required"),
@@ -136,7 +134,7 @@ export const aiSkillBluePrintSchema = z.object({
   xpValue: z.number().int().positive("XP value must be a positive integer"),
   iconPrompt: z.string().min(10, "Icon prompt is required"),
   criteria: CriteriaSchema.optional(),
-});
+})
 
 export const aiBadgeBluePrintSchema = z.object({
   title: z.string().min(3, "Title is required"),
@@ -144,21 +142,14 @@ export const aiBadgeBluePrintSchema = z.object({
   xpValue: z.number().int().positive("XP value must be a positive integer"),
   iconPrompt: z.string().min(10, "Icon prompt is required"),
   criteria: CriteriaSchema.optional(),
-});
+})
 
 export const aiBluePrintSchema = z.object({
-  skills: z
-    .array(aiSkillBluePrintSchema)
-    .min(3, "At least three skill is required"),
-  challenges: z
-    .array(aiChallengeBluePrintSchema)
-    .min(3, "At least three challenge is required"),
-  badges: z
-    .array(aiBadgeBluePrintSchema)
-    .min(3, "At least three badge is required"),
-});
+  skills: z.array(aiSkillBluePrintSchema).min(3, "At least three skill is required"),
+  challenges: z.array(aiChallengeBluePrintSchema).min(3, "At least three challenge is required"),
+  badges: z.array(aiBadgeBluePrintSchema).min(3, "At least three badge is required"),
+})
 
 // Type inference
-export type aiBluePrintSchema = z.infer<typeof aiBluePrintSchema>;
-
+export type aiBluePrintSchema = z.infer<typeof aiBluePrintSchema>
 ```
